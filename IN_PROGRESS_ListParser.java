@@ -94,27 +94,30 @@ public class ListParser
 	}	
 	
 	
-	
+
 	public static void writeUnique(File "/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole.fa", File "/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole_out.fa") throws Exception
 	
 	{
-		//method writes unique sequence to the output file with # times each
-		//sequence was seen in the input as the header (sorted w/sequence seen
-		//fewest times first)
+		HashMap<String, Integer> createMapTwo = new HashMap<String, Integer>();
+		
+			for (String key : createMapOne.keySet())
+		{
+			createMapTwo.put(seqID, count)
+		}
 	}
-	
-	
-	
-	
-	
-	
+
 	public static void main(String[] args) throws Exception
 	{
 		
+		HashMap<String, String> createMapOne = new HashMap<String,String>();
+		HashMap<String, Integer> createMapTwo = new HashMap<String, Integer>();
 		List<FastaSequence>fastaList = FastaSequence.readFastaFile("/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole.fa");
 		
 		for (FastaSequence fs : fastaList)
 		{
+			createMapOne.put(fs.seqID, fs.seqDets);
+			createMapTwo.put(fs.seqID, fs.count);
+			
 			System.out.println(fs.getHeader());
 			System.out.println(fs.getSequence());
 			System.out.println(fs.getGCRatio());
