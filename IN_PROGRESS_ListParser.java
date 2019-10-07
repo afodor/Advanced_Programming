@@ -1,7 +1,13 @@
+package scratch;
+import static java.util.stream.Collectors.*;
+import static java.util.Map.Entry.*;
+import java.io.*;
+import java.util.*;
+
 public class ListParser
 {
 
-	public class FastaSequence 
+	static class FastaSequence 
 	{
 		String seqID;
 		String seqDets;
@@ -44,9 +50,9 @@ public class ListParser
 		
 		BufferedReader reader = new BufferedReader (new FileReader (new File("/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/anole.fa")));
 		
-		List<FastaSequence> fastaList = null;
+		List<FastaSequence> fastaList = new ArrayList<FastaSequence>();
 		
-		FastaSequence fs = new ListParser.FastaSequence();
+		FastaSequence fs = new FastaSequence();
 		
 		for(String nextLine = reader.readLine(); nextLine != null; nextLine = reader.readLine())
 		{
@@ -100,7 +106,7 @@ public class ListParser
 		BufferedWriter writer = new BufferedWriter (new FileWriter (new File(outputFile)));
 		
 		List<FastaSequence>fastaList = ListParser.readFastaFile(inputFile);
-		HashMap<String, Integer> countMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> countMap = new LinkedHashMap<String, Integer>();
 		
 		for (FastaSequence fs : fastaList)
 		{
@@ -114,16 +120,19 @@ public class ListParser
 			}
 		}
 		
+			HashMap <String, Integer> sortedCounts = countMap
+			.entrySet()
+			.stream()
+			.sorted(comparingByValue())
+			.collect(toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
 			
-			//Sort values here from smallest count to largest before writing
-			countMap.forEach((key,value) -> 
+			sortedCounts.forEach((key,value) -> 
 			{
 				try
 				{
 					writer.write(key +"\n" + value +"\n");
 				} catch (IOException e)
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			});
@@ -131,6 +140,12 @@ public class ListParser
 		{
 			
 		}
+	
+			
+	
+	
+	
+	
 	}
 
 	public static void main(String[] args) throws Exception
@@ -150,3 +165,4 @@ public class ListParser
 		}
 		
 	}
+}
