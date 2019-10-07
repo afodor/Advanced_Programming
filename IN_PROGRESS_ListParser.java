@@ -1,8 +1,3 @@
-package scratch;
-
-import java.io.*;
-import java.util.*;
-
 public class ListParser
 {
 
@@ -43,13 +38,15 @@ public class ListParser
 		}
 	}
 	
-	public static List <FastaSequence> readFastaFile("/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole.fa") throws Exception
+	public static List <FastaSequence> readFastaFile(String file) throws Exception
 	{
-		BufferedReader reader = new BufferedReader (new FileReader (new File("/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole.fa")));
+		
+		
+		BufferedReader reader = new BufferedReader (new FileReader (new File("/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/anole.fa")));
 		
 		List<FastaSequence> fastaList = null;
 		
-		FastaSequence fs = new FastaSequence();
+		FastaSequence fs = new ListParser.FastaSequence();
 		
 		for(String nextLine = reader.readLine(); nextLine != null; nextLine = reader.readLine())
 		{
@@ -88,41 +85,68 @@ public class ListParser
 		{
 			fastaList.add(fs);
 			fs = null;
-		}
+		} 
+		
+		
 		
 		return fastaList;
+		
 	}	
 	
-	
 
-	public static void writeUnique(File "/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole.fa", File "/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole_out.fa") throws Exception
+	public static void writeUnique(String inputFile, String outputFile) throws Exception
 	
 	{
-		HashMap<String, Integer> createMapTwo = new HashMap<String, Integer>();
+		BufferedWriter writer = new BufferedWriter (new FileWriter (new File(outputFile)));
 		
-			for (String key : createMapOne.keySet())
+		List<FastaSequence>fastaList = ListParser.readFastaFile(inputFile);
+		HashMap<String, Integer> countMap = new HashMap<String, Integer>();
+		
+		for (FastaSequence fs : fastaList)
 		{
-			createMapTwo.put(seqID, count)
+			if (countMap.containsKey(fs.seqDets)) 
+			{
+				countMap.put(fs.seqDets, countMap.get(fs.seqDets) + 1);
+			}
+			else
+			{
+				countMap.put(fs.seqDets, 1);
+			}
+		}
+		
+			
+			//Sort values here from smallest count to largest before writing
+			countMap.forEach((key,value) -> 
+			{
+				try
+				{
+					writer.write(key +"\n" + value +"\n");
+				} catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+			
+		{
+			
 		}
 	}
 
 	public static void main(String[] args) throws Exception
 	{
-		
-		HashMap<String, String> createMapOne = new HashMap<String,String>();
-		HashMap<String, Integer> createMapTwo = new HashMap<String, Integer>();
-		List<FastaSequence>fastaList = FastaSequence.readFastaFile("/Users/laurenbrazell/Documents/eclipse_workspace/Lab_3/anole.fa");
+
+		List<FastaSequence>fastaList = ListParser.readFastaFile("/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/anole.fa");
+
 		
 		for (FastaSequence fs : fastaList)
 		{
-			createMapOne.put(fs.seqID, fs.seqDets);
-			createMapTwo.put(fs.seqID, fs.count);
-			
+	
 			System.out.println(fs.getHeader());
 			System.out.println(fs.getSequence());
 			System.out.println(fs.getGCRatio());
+			
+			writeUnique("/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/anole.fa", "/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/parsed_anole.txt");
 		}
 		
-		reader.close();
 	}
-}
