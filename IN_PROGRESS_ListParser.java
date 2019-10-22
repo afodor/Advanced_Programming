@@ -7,10 +7,16 @@ import java.util.*;
 public class ListParser
 {
 
-	static class FastaSequence 
+	public static class FastaSequence 
 	{
-		String seqID;
-		String seqDets;
+		 String seqID;
+		 String seqDets;
+		
+		FastaSequence(String seqID, String seqDets)
+		{
+			this.seqID = seqID;
+			this.seqDets = seqDets;
+		}
 		
 		public String getHeader()
 		{
@@ -26,82 +32,96 @@ public class ListParser
 		{
 			int numC = 0;
 			int numG = 0;	
-			float gcRatio = 0;
 			
 			for (int c = 0; c < seqDets.length(); c++)
 				{
+				
 					if (seqDets.charAt(c) == 'G')
 					{
+						
 						numG++;
 					}
 					else if (seqDets.charAt(c) == 'C')
 					{
 						numC++;
-					}
-				gcRatio = ((numG+numC)/seqDets.length());	
+					}	
 				}
-			return gcRatio;
+
+			int GCSum = numC + numG;
+			
+			return ((float)GCSum / seqDets.length());
+			
 		}
+	
 	}
 	
 	public static List <FastaSequence> readFastaFile(String file) throws Exception
 	{
 		
 		
-		BufferedReader reader = new BufferedReader (new FileReader (new File("/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/anole.fa")));
+		BufferedReader reader = new BufferedReader (new FileReader (new File(file)));
 		
 		List<FastaSequence> fastaList = new ArrayList<FastaSequence>();
-		
-		FastaSequence fs = new FastaSequence();
+	
+		FastaSequence fsTemp = new FastaSequence(null, "");
+
+		//need to assign value to seqID within the fs instance of the FastaSequence class
 		
 		for(String nextLine = reader.readLine(); nextLine != null; nextLine = reader.readLine())
 		{
+			
 			if (nextLine.startsWith(">"))
 			//If the nextLine begins with ">", prompts writing of seqID and removes the ">" for readability in the file.
 			{
-				if (fs.seqID.length() > 0) 
-				//If there is a sequence ID (i.e., the length is greater than 0), this counts the # of characters in the string.	
+				if (fsTemp.seqID == null) 
+				//If there is a sequence ID, this adds it to seqID.	
 				{
-					fastaList.add(fs);
-					fs = null;
-				//Clear out your variables
+					
+					fsTemp.seqID = nextLine.replace(">", "");
+					
 				}
-				fs.seqID = nextLine.replace(">", "");
+				else
+				{
+					fastaList.add(fsTemp);
+					fsTemp = new FastaSequence(null, "");
+				}
 			} 
 			
 			else if (nextLine.equals("")) 
-			// If next line does not have a value, that means we are not in a sequence. Therefore we need to write out
-			// the data that we have.
 			{
-				fastaList.add(fs);
-				fs = null;
+				if (fsTemp.seqID != null)
+			// If next line does not have a value, that means we are not in a sequence. Therefore we need to store
+			// the data that we have.
+				{
+					fastaList.add(fsTemp);
+					fsTemp = new FastaSequence(null, "");
+				}
 			}
 			
 			else
 			//If we are not on a sequence ID or the end of a sequence, this adds the string and the nextLine
 			//to concatenate multiple lines together.
 			{
-				fs.seqDets = fs.seqDets + nextLine;
+			
+				fsTemp.seqDets = fsTemp.seqDets + nextLine;
+			
 			}
-		}
+		}//closes out the for loop
 		
-		if (fs.seqDets.length() > 0) 
-		//If we have a sequence ID but we've reached the end of the file without writing sequence details, 
-		//this writes it.
+		if (fsTemp.seqDets.length() > 0) 
+		//If we have a sequence ID but we've reached the end of the file without storing sequence details, 
+		//this stores it.
 		{
-			fastaList.add(fs);
-			fs = null;
+			fastaList.add(fsTemp);
 		} 
 		
-		
+		reader.close();
 		
 		return fastaList;
-		
 	}	
 	
 
 	public static void writeUnique(String inputFile, String outputFile) throws Exception
-	
 	{
 		BufferedWriter writer = new BufferedWriter (new FileWriter (new File(outputFile)));
 		
@@ -130,29 +150,19 @@ public class ListParser
 			{
 				try
 				{
-					writer.write(key +"\n" + value +"\n");
+					writer.write(key +"\t" + value +"\n");
 				} catch (IOException e)
 				{
 					e.printStackTrace();
 				}
 			});
-			
-		{
-			
-		}
-	
-			
-	
-	
-	
-	
+			writer.close();
 	}
 
 	public static void main(String[] args) throws Exception
 	{
 
 		List<FastaSequence>fastaList = ListParser.readFastaFile("/Users/laurenbrazell/Documents/eclipse_workspace/Lab5/anole.fa");
-
 		
 		for (FastaSequence fs : fastaList)
 		{
